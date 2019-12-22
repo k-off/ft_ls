@@ -14,5 +14,8 @@
 # define __LS_H
 
 # include "Libft/libft.h"
+# include <sys/types.h>
+# include <dirent.h>
+
 
 #endif
