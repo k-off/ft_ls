@@ -2,6 +2,17 @@
 An Unix Project at Codam (42) - ls command
 
 
+## SUBJECT
+
+Recode the system command `ls` with it's basic options `l, a, r, R, t`. The project has to be performed in `C` language, according to internal 42 coding rules, `The Norme`.
+
+[SUBJECT](SUBJECT.ft_ls.en.pdf)
+
+[GET STARTED](GET_STARTED.en.pdf)
+
+[man ls](http://www.man7.org/linux/man-pages/man1/ls.1.html)
+
+
 ## Evaluation criteria:
 
 ### Preliminary tests:
