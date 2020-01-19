@@ -15,22 +15,59 @@
 
 # include "Libft/libft.h"
 # include <dirent.h>
+# include <pwd.h>
+# include <grp.h>
+# include <time.h>
 
 # define 			larRt (int[5]){1, 2, 4, 8, 16}
 
-typedef struct		s_args
+typedef struct		s_print
+{
+	char			*chmod;
+	size_t			links_qty;
+	char			*user;
+	char			*group;
+	size_t			size;
+	char			*date;
+	char			*link;
+}					t_print;
+
+typedef struct		s_obj
+{
+	char			*path;
+	char			*name;
+	unsigned		depth;
+	struct stat		val;
+	t_print			*print;
+	struct s_obj	*child;
+	struct s_obj	*next;
+}					t_obj;
+
+typedef struct		s_data
 {
 	int				optns;
-	char			**names;
-}					t_args;
+	t_obj			*obj;
+	size_t			*max_length;
+	int				qty;
+}					t_data;
 
-typedef struct		s_res
-{
-	struct s_res	*prev;
-	struct stat		value;
-	struct s_res	*next;
-}					t_res;
+/*
+** get_arguments.c
+*/
+int					get_args(t_data *data, char **argv, int argc);
+void				get_names(t_obj *obj, char *name, char *path_prefix);
 
-int					get_args(t_args **args, char **argv, int argc);
+/*
+** get_files_info.c
+*/
+void				get_info(t_obj *obj, int optns, int	depth, \
+							size_t *max_lengths);
 
+/*
+** set_print_strings.c
+*/
+size_t				*set_print(t_print *print, struct stat val, char *path);
+
+
+void				sort_objs(t_obj *objs, int rev, int by_time);
 #endif

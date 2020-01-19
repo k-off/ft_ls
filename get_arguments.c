@@ -12,36 +12,42 @@
 
 #include "ls.h"
 
-static void	get_names(char **names, char *name)
+void	get_names(t_obj *obj, char *name, char *path_prefix)
 {
-	static int		i = 0;
+	t_obj		*tmp;
+	char		*str;
 
-	if (ft_strlen(name) < 1)
+	tmp = obj;
+	while (tmp->next && tmp->name)
+		tmp = tmp->next;
+	if (tmp->name)
 	{
-		ft_printf("ft_ls: cannot access '': No such file or directory\n");
-		exit (1);
+		tmp->next = (t_obj*)ft_memalloc(sizeof(t_obj));
+		tmp = tmp->next;
 	}
-	names[i] = ft_strdup(name);
-	i++;
+	tmp->name = ft_strdup(name);
+	str = ft_strjoin(path_prefix, "/");
+	tmp->path = ft_strjoin(str, name);
+	free(str);
 }
 
 static void	get_options(int *options, char *argument)
 {
-	int		len;
+	size_t	len;
 	int		i;
 	int		j;
 
 	len = ft_strlen(argument);
 	if (len < 2)
-	{
 		ft_printf("ft_ls: cannot access '-': No such file or directory\n");
-		exit (1);
-	}
 	i = 1;
 	while (i < len)
 	{
 		if (!ft_strchr("larRt", argument[i]))
-			exit (ft_printf("ls: invalid option -- '%c'\n", argument[i]));
+		{
+			ft_printf("ls: illegal option -- '%c'\n", argument[i]);
+			exit (ft_printf("usage: ft_ls [-larRt] [file ...]"));
+		}
 		j = 0;
 		while (j < 5 && argument[i] != "larRt"[j])
 			j++;
@@ -50,24 +56,30 @@ static void	get_options(int *options, char *argument)
 	}
 }
 
-int     	get_args(t_args **args, char **argv, int argc)
+int     	get_args(t_data *data, char **argv, int argc)
 {
 	int		i;
 
-	*args = (t_args*)ft_memalloc(sizeof(t_args));
-	if (*args == 0)
-		return (0);
-	args[0]->names = (char**)ft_memalloc(sizeof(char*) * argc);
-	if (args[0]->names == 0)
-		return (0);
+	data->obj = (t_obj*)ft_memalloc(sizeof(t_obj));
+	data->qty = 0;
+	data->optns = 0;
 	i = 1;
 	while (i < argc)
 	{
 		if (argv[i][0] == '-')
-			get_options(&args[0]->optns, argv[i]);
+			get_options(&data->optns, argv[i]);
 		else
-			get_names(args[0]->names, argv[i]);
+		{
+			get_names(data->obj, argv[i], argv[i]);
+			data->qty++;
+		}
 		i++;
+	}
+	if (data->qty < 1)
+	{
+		data->obj->name = ft_strdup(".");
+		data->obj->path = ft_strdup(".");
+		data->qty = 1;
 	}
     return (1);
 }
