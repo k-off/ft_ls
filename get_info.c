@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   set_print_strings.c                                :+:    :+:            */
+/*   get_info.c                                         :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: pacovali@student.codam.nl                    +#+                     */
 /*                                                   +#+                      */
@@ -12,13 +12,23 @@
 
 #include "ls.h"
 
-void	get_children(t_obj *obj, int optns, int depth, size_t *max_lengths)
+static size_t	get_children(t_obj *obj, int optns, int depth,
+							size_t *max_lengths)
 {
 	DIR				*stream;
 	struct dirent	*cur_child;
+	size_t			res;
 
+	res = 0;
 	stream = opendir(obj->path);
+	if (!stream)
+		ft_printf("ft_ls: %s: Permission denied\n", obj->name);
+	if (!stream)
+		return (0);
 	obj->child = (t_obj*)ft_memalloc(sizeof(t_obj) + 1);
+	obj->child->depth = depth;
+//	if (!obj->lengths)
+//		obj->lengths = (size_t*)ft_memalloc(sizeof(size_t) * 5);
 	cur_child = readdir(stream);
 	while (cur_child)
 	{
@@ -26,42 +36,50 @@ void	get_children(t_obj *obj, int optns, int depth, size_t *max_lengths)
 		cur_child = readdir(stream);
 	}
 	closedir(stream);
-	if (optns & 8 || depth < 2)
-		get_info(obj->child, optns, depth, max_lengths);
+	res = get_info(obj->child, optns, depth, max_lengths);
+	return (res);
 }
 
-void	check_lengths(size_t *cur_lengths, size_t max_lengths[5])
+static void		check_lengths(size_t *cur_lengths, size_t *max_lengths)
 {
 	int				i;
 
 	i = 0;
 	while (i < 5)
 	{
-		if (cur_lengths[i] > max_lengths[i])
+		if (max_lengths[i] > 40)
+			max_lengths[i] = 0;
+		if (cur_lengths[i] > max_lengths[i] && cur_lengths[i] < 40)
 			max_lengths[i] = cur_lengths[i];
 		i++;
 	}
 }
 
-void	get_info(t_obj *obj, int optns, int	depth, size_t max_lengths[5])
+size_t			get_info(t_obj *obj, int optns, int depth, size_t *max_len)
 {
 	t_obj			*tmp;
+	size_t			res;
 
+	res = 0;
 	tmp = obj;
 	lstat(tmp->name, &tmp->val);
 	while (tmp)
 	{
 		tmp->depth = depth;
 		lstat(tmp->path, &tmp->val);
-		tmp->print = (t_print*)ft_memalloc(sizeof(t_print) + 1);
-		check_lengths(set_print(tmp->print, tmp->val, tmp->path), max_lengths);
+		if (optns & 2 || tmp->name[0] != '.')
+			res += tmp->val.st_blocks;
+		if (!tmp->print)
+			tmp->print = (t_print*)ft_memalloc(sizeof(t_print) + 1);
+		set_print(tmp->print, tmp->val, tmp->path);
+//		check_lengths(,
+//					max_len);
 		if (S_ISDIR(tmp->val.st_mode))
-			if (((ft_strcmp(".", tmp->name) == 0 ||
-				 ft_strcmp("..", tmp->name) == 0) && tmp->depth < 1) ||
-				(ft_strcmp(".", tmp->name) != 0 &&
-				ft_strcmp("..", tmp->name) != 0)
-				)
-			get_children(tmp, optns, depth + 1, max_lengths);
+			if (tmp->depth < 1 ||
+				(optns & 8 && ft_strcmp(".", tmp->name) != 0 &&
+				ft_strcmp("..", tmp->name) != 0))
+				tmp->child_size = get_children(tmp, optns, depth + 1, max_len);
 		tmp = tmp->next;
 	}
+	return (res);
 }

@@ -14,21 +14,20 @@
 # define __LS_H
 
 # include "Libft/libft.h"
+# include <sys/syslimits.h>
 # include <dirent.h>
 # include <pwd.h>
 # include <grp.h>
 # include <time.h>
 
-# define 			larRt (int[5]){1, 2, 4, 8, 16}
-
 typedef struct		s_print
 {
 	char			*chmod;
-	size_t			links_qty;
+	char			*links_qty;
 	char			*user;
 	char			*group;
-	size_t			size;
-	char			*date;
+	char			*size;
+	char			date[13];
 	char			*link;
 }					t_print;
 
@@ -36,9 +35,11 @@ typedef struct		s_obj
 {
 	char			*path;
 	char			*name;
-	unsigned		depth;
+	size_t			depth;
 	struct stat		val;
+//	size_t			*lengths;
 	t_print			*print;
+	size_t			child_size;
 	struct s_obj	*child;
 	struct s_obj	*next;
 }					t_obj;
@@ -60,14 +61,24 @@ void				get_names(t_obj *obj, char *name, char *path_prefix);
 /*
 ** get_files_info.c
 */
-void				get_info(t_obj *obj, int optns, int	depth, \
+size_t				get_info(t_obj *obj, int optns, int	depth, \
 							size_t *max_lengths);
 
 /*
 ** set_print_strings.c
 */
-size_t				*set_print(t_print *print, struct stat val, char *path);
+void				set_print(t_print *print, struct stat val, char *path);
+size_t				*save_max(t_print *print);
+
+/*
+** print_info.c
+*/
+void				print_info(t_obj *objs, size_t qty, int optns, size_t *max);
+
+/*
+** sort.c
+*/
+t_obj				*sort_objs(t_obj *objs, int rev, int by_time);
 
 
-void				sort_objs(t_obj *objs, int rev, int by_time);
 #endif

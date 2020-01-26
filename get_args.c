@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   get_arguments.c                                    :+:    :+:            */
+/*   get_args.c                                         :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: pacovali@student.codam.nl                    +#+                     */
 /*                                                   +#+                      */
@@ -12,7 +12,7 @@
 
 #include "ls.h"
 
-void	get_names(t_obj *obj, char *name, char *path_prefix)
+void		get_names(t_obj *obj, char *name, char *path_prefix)
 {
 	t_obj		*tmp;
 	char		*str;
@@ -25,18 +25,28 @@ void	get_names(t_obj *obj, char *name, char *path_prefix)
 		tmp->next = (t_obj*)ft_memalloc(sizeof(t_obj));
 		tmp = tmp->next;
 	}
+	if (!tmp->print)
+		tmp->print = (t_print*)ft_memalloc(sizeof(t_print) + 1);
 	tmp->name = ft_strdup(name);
-	str = ft_strjoin(path_prefix, "/");
-	tmp->path = ft_strjoin(str, name);
-	free(str);
+	if (obj->depth > 0)
+	{
+		str = path_prefix[ft_strlen(path_prefix) - 1] != '/' ?
+			ft_strjoin(path_prefix, "/") : ft_strdup(path_prefix);
+		tmp->path = ft_strjoin(str, name);
+		free(str);
+	}
+	else
+		tmp->path = ft_strdup(name);
 }
 
 static void	get_options(int *options, char *argument)
 {
-	size_t	len;
-	int		i;
-	int		j;
+	size_t		len;
+	int			i;
+	int			j;
+	int			*larrt;
 
+	larrt = (int[5]){1, 2, 4, 8, 16};
 	len = ft_strlen(argument);
 	if (len < 2)
 		ft_printf("ft_ls: cannot access '-': No such file or directory\n");
@@ -45,24 +55,23 @@ static void	get_options(int *options, char *argument)
 	{
 		if (!ft_strchr("larRt", argument[i]))
 		{
-			ft_printf("ls: illegal option -- '%c'\n", argument[i]);
-			exit (ft_printf("usage: ft_ls [-larRt] [file ...]"));
+			ft_printf("ft_ls: illegal option -- '%c'\n", argument[i]);
+			exit(ft_printf("usage: ft_ls [-larRt] [file ...]\n"));
 		}
 		j = 0;
 		while (j < 5 && argument[i] != "larRt"[j])
 			j++;
-		*options |= larRt[j];
+		*options |= larrt[j];
 		i++;
 	}
 }
 
-int     	get_args(t_data *data, char **argv, int argc)
+int			get_args(t_data *data, char **argv, int argc)
 {
 	int		i;
 
 	data->obj = (t_obj*)ft_memalloc(sizeof(t_obj));
 	data->qty = 0;
-	data->optns = 0;
 	i = 1;
 	while (i < argc)
 	{
@@ -81,5 +90,5 @@ int     	get_args(t_data *data, char **argv, int argc)
 		data->obj->path = ft_strdup(".");
 		data->qty = 1;
 	}
-    return (1);
+	return (1);
 }
