@@ -22,13 +22,11 @@ static size_t	get_children(t_obj *obj, int optns, int depth,
 	res = 0;
 	stream = opendir(obj->path);
 	if (!stream)
-		ft_printf("ft_ls: %s: Permission denied\n", obj->name);
+		ft_printf("ft_ls: %s: Permission denied\n\0", obj->name);
 	if (!stream)
 		return (0);
 	obj->child = (t_obj*)ft_memalloc(sizeof(t_obj) + 1);
 	obj->child->depth = depth;
-//	if (!obj->lengths)
-//		obj->lengths = (size_t*)ft_memalloc(sizeof(size_t) * 5);
 	cur_child = readdir(stream);
 	while (cur_child)
 	{
@@ -38,21 +36,6 @@ static size_t	get_children(t_obj *obj, int optns, int depth,
 	closedir(stream);
 	res = get_info(obj->child, optns, depth, max_lengths);
 	return (res);
-}
-
-static void		check_lengths(size_t *cur_lengths, size_t *max_lengths)
-{
-	int				i;
-
-	i = 0;
-	while (i < 5)
-	{
-		if (max_lengths[i] > 40)
-			max_lengths[i] = 0;
-		if (cur_lengths[i] > max_lengths[i] && cur_lengths[i] < 40)
-			max_lengths[i] = cur_lengths[i];
-		i++;
-	}
 }
 
 size_t			get_info(t_obj *obj, int optns, int depth, size_t *max_len)
@@ -72,12 +55,10 @@ size_t			get_info(t_obj *obj, int optns, int depth, size_t *max_len)
 		if (!tmp->print)
 			tmp->print = (t_print*)ft_memalloc(sizeof(t_print) + 1);
 		set_print(tmp->print, tmp->val, tmp->path);
-//		check_lengths(,
-//					max_len);
 		if (S_ISDIR(tmp->val.st_mode))
 			if (tmp->depth < 1 ||
-				(optns & 8 && ft_strcmp(".", tmp->name) != 0 &&
-				ft_strcmp("..", tmp->name) != 0))
+				(optns & 8 && ft_strcmp(".\0", tmp->name) != 0 &&
+				ft_strcmp("..\0", tmp->name) != 0))
 				tmp->child_size = get_children(tmp, optns, depth + 1, max_len);
 		tmp = tmp->next;
 	}

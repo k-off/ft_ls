@@ -37,7 +37,6 @@ typedef struct		s_obj
 	char			*name;
 	size_t			depth;
 	struct stat		val;
-//	size_t			*lengths;
 	t_print			*print;
 	size_t			child_size;
 	struct s_obj	*child;
@@ -79,6 +78,5 @@ void				print_info(t_obj *objs, size_t qty, int optns, size_t *max);
 ** sort.c
 */
 t_obj				*sort_objs(t_obj *objs, int rev, int by_time);
-
 
 #endif

@@ -24,7 +24,7 @@ int		main(int argc, char **argv)
 	if (data->qty == 1 && data->obj->print->chmod[0] == 'd')
 	{
 		if (data->optns & 1)
-			ft_printf("total %d\n", data->obj->child_size);
+			ft_printf("total %d\n\0", data->obj->child_size);
 		print_info(data->obj->child, data->qty, data->optns, data->max_length);
 	}
 	else

@@ -11,13 +11,15 @@
 #******************************************************************************#
 
 NAME = ft_ls
-SRCS = *.c
-MKOBJ = @gcc -c
-FLAGS = -Wall -Wextra -Werror
-HDRS = -I . ./Libft/*.h
-OBJS = *.o
+
+SRCS = main.c get_args.c get_info.c set_print.c sort_info.c print_info.c
+OBJS = main.o get_args.o get_info.o set_print.o sort_info.o print_info.o
+
+HDRS = -I . ./Libft/libft.h
 LFT = Libft/libft.a
 
+MKOBJ = @gcc -c
+FLAGS = -Wall -Wextra -Werror
 MKEXE = gcc -o $(NAME)
 
 all: $(NAME)

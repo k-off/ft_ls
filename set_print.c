@@ -16,7 +16,7 @@ static void	set_permissions(char **mod, mode_t md)
 {
 	mod[0] = (char*)ft_memalloc(sizeof(char) * 11);
 	if (!mod[0])
-		exit(!!ft_printf("ft_ls: error: malloc failed on permissions\n"));
+		exit(!!ft_printf("ft_ls: error: malloc failed on permissions\n\0"));
 	mod[0][0] = (S_ISDIR(md) ? 'd' : '-');
 	mod[0][0] = (S_ISLNK(md) ? 'l' : mod[0][0]);
 	mod[0][0] = (S_ISFIFO(md) ? 'p' : mod[0][0]);
@@ -49,12 +49,12 @@ static void	set_user_group(t_print *print, struct stat val)
 	if (pwd)
 		print->user = ft_strdup(pwd->pw_name);
 	else
-		print->user = ft_strdup("");
+		print->user = ft_strdup("\0");
 	gr = getgrgid(val.st_gid);
 	if (gr)
 		print->group = ft_strdup(gr->gr_name);
 	else
-		print->group = ft_strdup("");
+		print->group = ft_strdup("\0");
 }
 
 static void	set_date(char *date, time_t file_time)
@@ -65,7 +65,7 @@ static void	set_date(char *date, time_t file_time)
 	while (cur_time < 1)
 		cur_time = time(NULL);
 	if (!date)
-		exit(!!ft_printf("error: malloc failed on date string\n"));
+		exit(!!ft_printf("error: malloc failed on date string\n\0"));
 	file_time_str = ctime(&file_time);
 	file_time_str[24] = 0;
 	ft_memcpy(&date[0], &file_time_str[4], 7);
@@ -75,7 +75,7 @@ static void	set_date(char *date, time_t file_time)
 		ft_memcpy(&date[7], &file_time_str[19], 5);
 }
 
-size_t	*save_max(t_print *print)
+size_t		*save_max(t_print *print)
 {
 	static size_t	*max_len = NULL;
 	size_t			*len;
@@ -110,15 +110,15 @@ void		set_print(t_print *print, struct stat val, char *path)
 	set_date(print->date, val.st_mtimespec.tv_sec);
 	save_max(print);
 	if (val.st_ctimespec.tv_sec == 0)
-		ft_printf("ft_ls: %s: File couldn't be found\n", path);
+		ft_printf("ft_ls: %s: File couldn't be found\n\0", path);
 	if (print->chmod[0] == 'l')
 	{
 		tmp = (char*)ft_memalloc(sizeof(char) * (val.st_size + 1));
 		link_len = readlink(path, tmp, val.st_size);
 		tmp[link_len] = 0;
-		print->link = ft_strjoin(" -> ", tmp);
+		print->link = ft_strjoin(" -> \0", tmp);
 		free(tmp);
 	}
 	else
-		print->link = ft_strdup("");
+		print->link = ft_strdup("\0");
 }
